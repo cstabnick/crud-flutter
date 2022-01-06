@@ -30,9 +30,7 @@ class _DisplayUsersState extends State<DisplayUsers> {
   }
 
   FutureOr onGoBack(dynamic value) {
-    setState(() {
-      fut = getAll();
-    });
+    setState(() {}); 
   }
 
   @override
