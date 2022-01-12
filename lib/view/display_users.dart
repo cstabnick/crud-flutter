@@ -24,7 +24,7 @@ class _DisplayUsersState extends State<DisplayUsers> {
     }
     var decodedData = jsonDecode(response.body);
     for (var u in decodedData) {
-      users.add(User(u["user_id"], u["username"], u["email"], u["password"]));
+      users.add(User(u["user_id"], u["username"], u["email"], "u[]"));
     }
     return users;
   }
