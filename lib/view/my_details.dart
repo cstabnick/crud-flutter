@@ -6,7 +6,7 @@ import '../util.dart';
 
 class MyDetails extends StatefulWidget {
   final User? user;
-  const MyDetails({this.user});
+  const MyDetails(this.user);
 
   @override
   _MyDetailsState createState() => _MyDetailsState();
@@ -23,11 +23,6 @@ class _MyDetailsState extends State<MyDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Details'),
-        elevation: 0.0,
-        backgroundColor: Colors.indigo[700],
-      ),
       body: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 18, vertical: 32),

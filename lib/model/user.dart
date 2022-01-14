@@ -3,6 +3,7 @@ class User {
   late String username;
   late String email;
   late String password;
+  late int sessionId;
 
-  User(this.id, this.username, this.email, this.password);
+  User(this.id, this.username, this.email, this.password, this.sessionId);
 }

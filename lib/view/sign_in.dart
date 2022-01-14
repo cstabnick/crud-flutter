@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import './display_users.dart';
+import './home.dart';
 import './add_user.dart';
 import '../model/user.dart';
 import '../util.dart';
@@ -13,13 +14,17 @@ class SignIn extends StatefulWidget {
   _SignInState createState() => _SignInState();
 }
 
-User user = User(0, '', '', '');
+
+String email = "";
+String password = "";
 
 class _SignInState extends State<SignIn> {
+  
+
   TextEditingController emailController =
-      TextEditingController(text: user.email);
+      TextEditingController(text: email);
   TextEditingController passwordController =
-      TextEditingController(text: user.password);
+      TextEditingController(text: password);
 
   String errorMessage = "";
 
@@ -32,33 +37,37 @@ class _SignInState extends State<SignIn> {
         headers: <String, String>{
           'Content-Type': 'Application/json; charset=UTF-8',
         },
-        body: json.encode({"email": user.email, "password": user.password}));
+        body: json.encode({"email": email, "password": password}));
 
     if (loginRes.statusCode == 401) {
       errorMessage = "Bad job dude!";
       setState(() {});
-    } else if (loginRes.statusCode == 200) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (_) => DisplayUsers()));
-      // Navigator.of(context).pushAndRemoveUntil(
-      //     MaterialPageRoute(builder: (BuildContext context) => DisplayUsers()),
-      //     (Route<dynamic> route) => false);
+    } 
+    
+    if (loginRes.statusCode == 200) {
+      // Navigator.push(
+      //     context, MaterialPageRoute(builder: (_) => Home()));
+      // User u = User();
+      var decodedData = jsonDecode(loginRes.body);
+
+      User user = User(decodedData["user_id"], decodedData["username"], decodedData["email"], '', decodedData["current_session_id"]);
+      
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (BuildContext context) => Home(user)),
+          (Route<dynamic> route) => false);
     }
   }
 
   void newUser() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => CreateUser()));
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (BuildContext context) => CreateUser()),
+        (Route<dynamic> route) => false); 
   }
 
   @override
   Widget build(BuildContext context) {
     //  print(widget.id);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.indigo[700],
-        elevation: 0.0,
-        title: Text('Sign In'),
-      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.only(top: 100, bottom: 100, left: 18, right: 18),
@@ -87,7 +96,7 @@ class _SignInState extends State<SignIn> {
                     child: TextField(
                       controller: emailController,
                       onChanged: (val) {
-                        user.email = val;
+                        email = val;
                       },
                       decoration: InputDecoration(hintText: "email"),
                     )),
@@ -97,7 +106,7 @@ class _SignInState extends State<SignIn> {
                     child: TextField(
                       //hintText: 'Password',
                       onChanged: (val) {
-                        user.password = val;
+                        password = val;
                       },
                       controller: passwordController,
                       obscureText: true,

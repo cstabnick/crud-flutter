@@ -1,26 +1,30 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import './display_users.dart';
+import './home.dart';
 import '../model/user.dart';
 import '../util.dart';
 
 class CreateUser extends StatefulWidget {
   const CreateUser({Key? key}) : super(key: key);
+  
 
   @override
   _CreateUserState createState() => _CreateUserState();
 }
 
-User user = User(0, '', '', '');
+String email = "";
+String password = "";
+String username = "";
+
 
 class _CreateUserState extends State<CreateUser> {
   TextEditingController nameController =
-      TextEditingController(text: user.username);
+      TextEditingController(text: username);
   TextEditingController emailController =
-      TextEditingController(text: user.email);
+      TextEditingController(text: email);
   TextEditingController passwordController =
-      TextEditingController(text: user.password);
+      TextEditingController(text: password);
 
   String errorMessage = "";
 
@@ -30,18 +34,34 @@ class _CreateUserState extends State<CreateUser> {
           'Content-Type': 'Application/json; charset=UTF-8',
         },
         body: json.encode({
-          "username": user.username,
-          "email": user.email,
-          "password": user.password
+          "username": username,
+          "email": email,
+          "password": password
         }));
 
-    if (newUser.statusCode == 409) {
-      errorMessage = "User already exists";
-      setState(() {}); // force refresh?
-    } else {
+
+    if (newUser.statusCode == 200) {
+      var decodedData = jsonDecode(newUser.body);
+
+      User user = User(decodedData["user_id"], decodedData["username"], decodedData["email"], '', decodedData['current_session_id']);
+      
       Navigator.push(
-          context, MaterialPageRoute(builder: (_) => DisplayUsers()));
+          context, MaterialPageRoute(builder: (_) => Home(user)));
+      errorMessage = "";
     }
+    else {
+      switch (newUser.statusCode) {
+        case 409: {
+            errorMessage = "User already exists";
+        } break;
+        default: {
+            errorMessage = "Rip brub please try again";
+        } break;
+      }
+
+    }
+    
+    setState(() {}); // force refresh?
   }
 
   @override
@@ -78,7 +98,7 @@ class _CreateUserState extends State<CreateUser> {
                     child: TextField(
                       controller: nameController,
                       onChanged: (val) {
-                        user.username = val;
+                        username = val;
                       },
                       decoration: InputDecoration(hintText: "username"),
                     )),
@@ -91,7 +111,7 @@ class _CreateUserState extends State<CreateUser> {
                     child: TextField(
                       controller: emailController,
                       onChanged: (val) {
-                        user.email = val;
+                        email = val;
                       },
                       decoration: InputDecoration(hintText: "email"),
                     )),
@@ -101,7 +121,7 @@ class _CreateUserState extends State<CreateUser> {
                     child: TextField(
                       //hintText: 'Password',
                       onChanged: (val) {
-                        user.password = val;
+                        password = val;
                       },
                       controller: passwordController,
                       obscureText: true,
